@@ -1,0 +1,32 @@
+{
+  "propserviceApp": {
+    "propserviceComplex": {
+      "home": {
+        "title": "Complexes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Complex",
+        "createOrEditLabel": "Create or edit a Complex",
+        "search": "Search for Complex",
+        "notFound": "No Complexes found"
+      },
+      "created": "A new Complex is created with identifier {{ param }}",
+      "updated": "A Complex is updated with identifier {{ param }}",
+      "deleted": "A Complex is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Complex {{ id }}?"
+      },
+      "detail": {
+        "title": "Complex"
+      },
+      "id": "Id",
+      "complexName": "Complex Name",
+      "state": "State",
+      "county": "County",
+      "city": "City",
+      "town": "Town",
+      "addressCode": "Address Code",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At"
+    }
+  }
+}

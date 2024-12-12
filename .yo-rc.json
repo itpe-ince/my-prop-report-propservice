@@ -1,0 +1,30 @@
+{
+  "generator-jhipster": {
+    "applicationIndex": 1,
+    "applicationType": "microservice",
+    "authenticationType": "oauth2",
+    "baseName": "propservice",
+    "buildTool": "gradle",
+    "cacheProvider": "redis",
+    "clientFramework": "react",
+    "databaseType": "sql",
+    "devDatabaseType": "mysql",
+    "devServerPort": 9061,
+    "enableHibernateCache": false,
+    "enableSwaggerCodegen": true,
+    "enableTranslation": true,
+    "entities": ["Complex", "Property", "Transaction"],
+    "jhipsterVersion": "8.7.3",
+    "jwtSecretKey": "ODZhOTEzOGJiYmM0N2EwNDU0NzM2MjIzZmNmYWQzNDg5ZjJkODJiMTVkMWU2YjdjZTE0MzViYjAwMThjNTcwODhjNDgxMjYwNTI0ZTdhNmE0MGY3NjMzNDQ4MWU5M2U2ZDhjOWVlMTAyMTRiN2Q5YjkwODIyY2RkNDA0ZDllMjI=",
+    "languages": ["ko", "en"],
+    "lastLiquibaseTimestamp": 1733976838000,
+    "messageBroker": "kafka",
+    "nativeLanguage": "ko",
+    "packageName": "com.dnc.mprs.propservice",
+    "prodDatabaseType": "mysql",
+    "searchEngine": "elasticsearch",
+    "serverPort": 8081,
+    "serviceDiscoveryType": "consul",
+    "skipUserManagement": true
+  }
+}

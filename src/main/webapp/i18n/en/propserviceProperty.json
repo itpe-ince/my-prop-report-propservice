@@ -1,0 +1,40 @@
+{
+  "propserviceApp": {
+    "propserviceProperty": {
+      "home": {
+        "title": "Properties",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Property",
+        "createOrEditLabel": "Create or edit a Property",
+        "search": "Search for Property",
+        "notFound": "No Properties found"
+      },
+      "created": "A new Property is created with identifier {{ param }}",
+      "updated": "A Property is updated with identifier {{ param }}",
+      "deleted": "A Property is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Property {{ id }}?"
+      },
+      "detail": {
+        "title": "Property"
+      },
+      "id": "Id",
+      "complexId": "Complex Id",
+      "address": "Address",
+      "regionCd": "Region Cd",
+      "localName": "Local Name",
+      "street": "Street",
+      "floor": "Floor",
+      "type": "Type",
+      "area": "Area",
+      "rooms": "Rooms",
+      "bathrooms": "Bathrooms",
+      "buildYear": "Build Year",
+      "parkingYn": "Parking Yn",
+      "description": "Description",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "complex": "Complex"
+    }
+  }
+}
