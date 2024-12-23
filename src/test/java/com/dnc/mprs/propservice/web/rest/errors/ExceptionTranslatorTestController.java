@@ -54,7 +54,7 @@ public class ExceptionTranslatorTestController {
 
     public static class TestDTO {
 
-        @NotNull
+        @NotNull(message = "must not be null")
         private String test;
 
         public String getTest() {

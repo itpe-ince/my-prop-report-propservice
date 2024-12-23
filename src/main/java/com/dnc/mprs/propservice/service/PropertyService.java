@@ -3,13 +3,13 @@ package com.dnc.mprs.propservice.service;
 import com.dnc.mprs.propservice.domain.Property;
 import com.dnc.mprs.propservice.repository.PropertyRepository;
 import com.dnc.mprs.propservice.repository.search.PropertySearchRepository;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link com.dnc.mprs.propservice.domain.Property}.
@@ -35,11 +35,9 @@ public class PropertyService {
      * @param property the entity to save.
      * @return the persisted entity.
      */
-    public Property save(Property property) {
+    public Mono<Property> save(Property property) {
         LOG.debug("Request to save Property : {}", property);
-        property = propertyRepository.save(property);
-        propertySearchRepository.index(property);
-        return property;
+        return propertyRepository.save(property).flatMap(propertySearchRepository::save);
     }
 
     /**
@@ -48,11 +46,9 @@ public class PropertyService {
      * @param property the entity to save.
      * @return the persisted entity.
      */
-    public Property update(Property property) {
+    public Mono<Property> update(Property property) {
         LOG.debug("Request to update Property : {}", property);
-        property = propertyRepository.save(property);
-        propertySearchRepository.index(property);
-        return property;
+        return propertyRepository.save(property).flatMap(propertySearchRepository::save);
     }
 
     /**
@@ -61,15 +57,12 @@ public class PropertyService {
      * @param property the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<Property> partialUpdate(Property property) {
+    public Mono<Property> partialUpdate(Property property) {
         LOG.debug("Request to partially update Property : {}", property);
 
         return propertyRepository
             .findById(property.getId())
             .map(existingProperty -> {
-                if (property.getComplexId() != null) {
-                    existingProperty.setComplexId(property.getComplexId());
-                }
                 if (property.getAddress() != null) {
                     existingProperty.setAddress(property.getAddress());
                 }
@@ -115,10 +108,10 @@ public class PropertyService {
 
                 return existingProperty;
             })
-            .map(propertyRepository::save)
-            .map(savedProperty -> {
-                propertySearchRepository.index(savedProperty);
-                return savedProperty;
+            .flatMap(propertyRepository::save)
+            .flatMap(savedProperty -> {
+                propertySearchRepository.save(savedProperty);
+                return Mono.just(savedProperty);
             });
     }
 
@@ -129,9 +122,26 @@ public class PropertyService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Property> findAll(Pageable pageable) {
+    public Flux<Property> findAll(Pageable pageable) {
         LOG.debug("Request to get all Properties");
-        return propertyRepository.findAll(pageable);
+        return propertyRepository.findAllBy(pageable);
+    }
+
+    /**
+     * Returns the number of properties available.
+     * @return the number of entities in the database.
+     *
+     */
+    public Mono<Long> countAll() {
+        return propertyRepository.count();
+    }
+
+    /**
+     * Returns the number of properties available in search repository.
+     *
+     */
+    public Mono<Long> searchCount() {
+        return propertySearchRepository.count();
     }
 
     /**
@@ -141,7 +151,7 @@ public class PropertyService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<Property> findOne(Long id) {
+    public Mono<Property> findOne(Long id) {
         LOG.debug("Request to get Property : {}", id);
         return propertyRepository.findById(id);
     }
@@ -150,11 +160,11 @@ public class PropertyService {
      * Delete the property by id.
      *
      * @param id the id of the entity.
+     * @return a Mono to signal the deletion
      */
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         LOG.debug("Request to delete Property : {}", id);
-        propertyRepository.deleteById(id);
-        propertySearchRepository.deleteFromIndexById(id);
+        return propertyRepository.deleteById(id).then(propertySearchRepository.deleteById(id));
     }
 
     /**
@@ -165,7 +175,7 @@ public class PropertyService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Property> search(String query, Pageable pageable) {
+    public Flux<Property> search(String query, Pageable pageable) {
         LOG.debug("Request to search for a page of Properties for query {}", query);
         return propertySearchRepository.search(query, pageable);
     }

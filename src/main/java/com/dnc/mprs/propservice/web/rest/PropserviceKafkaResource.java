@@ -1,12 +1,13 @@
 package com.dnc.mprs.propservice.web.rest;
 
 import com.dnc.mprs.propservice.broker.KafkaConsumer;
-import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/propservice-kafka")
@@ -24,18 +25,15 @@ public class PropserviceKafkaResource {
     }
 
     @PostMapping("/publish")
-    public void publish(@RequestParam("message") String message) {
-        LOG.debug("REST request the message : {} to send to Kafka topic ", message);
+    public Mono<ResponseEntity<Void>> publish(@RequestParam("message") String message) {
+        LOG.debug("REST request the message : {} to send to Kafka topic", message);
         streamBridge.send(PRODUCER_BINDING_NAME, message);
+        return Mono.just(ResponseEntity.noContent().build());
     }
 
-    @GetMapping("/register")
-    public ResponseBodyEmitter register(Principal principal) {
-        return kafkaConsumer.register(principal.getName());
-    }
-
-    @GetMapping("/unregister")
-    public void unregister(Principal principal) {
-        kafkaConsumer.unregister(principal.getName());
+    @GetMapping("/consume")
+    public Flux<String> consume() {
+        LOG.debug("REST request to consume records from Kafka topics");
+        return this.kafkaConsumer.getFlux();
     }
 }

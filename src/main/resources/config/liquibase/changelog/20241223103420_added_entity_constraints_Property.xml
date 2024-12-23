@@ -8,7 +8,7 @@
     <!--
         Added the constraints for entity Property.
     -->
-    <changeSet id="20241212041258-2" author="jhipster">
+    <changeSet id="20241223103420-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="complex_id"
                                  baseTableName="property"

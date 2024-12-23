@@ -33,12 +33,6 @@ export const PropertyDetail = () => {
           </dt>
           <dd>{propertyEntity.id}</dd>
           <dt>
-            <span id="complexId">
-              <Translate contentKey="propserviceApp.propserviceProperty.complexId">Complex Id</Translate>
-            </span>
-          </dt>
-          <dd>{propertyEntity.complexId}</dd>
-          <dt>
             <span id="address">
               <Translate contentKey="propserviceApp.propserviceProperty.address">Address</Translate>
             </span>

@@ -8,7 +8,6 @@ dependencies {
   // Dependency required to parse options. Refer to https://github.com/liquibase/liquibase-gradle-plugin/tree/Release_2.2.0#news.
   liquibaseRuntime "info.picocli:picocli:4.7.6"
   liquibaseRuntime "com.mysql:mysql-connector-j"
-  liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${dependencyManagement.importedProperties['liquibase.version']}"
   // jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
 }
 
@@ -32,7 +31,6 @@ liquibase {
       url "jdbc:mysql://localhost:3306/propservice"
       username "root"
       changelogFile project.ext.diffChangelogFile
-      referenceUrl "hibernate:spring:com.dnc.mprs.propservice.domain?dialect=org.hibernate.dialect.MySQL8Dialect&hibernate.physical_naming_strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
       logLevel "debug"
       classpath "$buildDir/classes/java/main"
       excludeObjects "oauth_access_token, oauth_approvals, oauth_client_details, oauth_client_token, oauth_code, oauth_refresh_token"

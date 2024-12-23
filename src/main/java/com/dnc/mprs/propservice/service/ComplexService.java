@@ -3,13 +3,13 @@ package com.dnc.mprs.propservice.service;
 import com.dnc.mprs.propservice.domain.Complex;
 import com.dnc.mprs.propservice.repository.ComplexRepository;
 import com.dnc.mprs.propservice.repository.search.ComplexSearchRepository;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link com.dnc.mprs.propservice.domain.Complex}.
@@ -35,11 +35,9 @@ public class ComplexService {
      * @param complex the entity to save.
      * @return the persisted entity.
      */
-    public Complex save(Complex complex) {
+    public Mono<Complex> save(Complex complex) {
         LOG.debug("Request to save Complex : {}", complex);
-        complex = complexRepository.save(complex);
-        complexSearchRepository.index(complex);
-        return complex;
+        return complexRepository.save(complex).flatMap(complexSearchRepository::save);
     }
 
     /**
@@ -48,11 +46,9 @@ public class ComplexService {
      * @param complex the entity to save.
      * @return the persisted entity.
      */
-    public Complex update(Complex complex) {
+    public Mono<Complex> update(Complex complex) {
         LOG.debug("Request to update Complex : {}", complex);
-        complex = complexRepository.save(complex);
-        complexSearchRepository.index(complex);
-        return complex;
+        return complexRepository.save(complex).flatMap(complexSearchRepository::save);
     }
 
     /**
@@ -61,7 +57,7 @@ public class ComplexService {
      * @param complex the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<Complex> partialUpdate(Complex complex) {
+    public Mono<Complex> partialUpdate(Complex complex) {
         LOG.debug("Request to partially update Complex : {}", complex);
 
         return complexRepository
@@ -94,10 +90,10 @@ public class ComplexService {
 
                 return existingComplex;
             })
-            .map(complexRepository::save)
-            .map(savedComplex -> {
-                complexSearchRepository.index(savedComplex);
-                return savedComplex;
+            .flatMap(complexRepository::save)
+            .flatMap(savedComplex -> {
+                complexSearchRepository.save(savedComplex);
+                return Mono.just(savedComplex);
             });
     }
 
@@ -108,9 +104,26 @@ public class ComplexService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Complex> findAll(Pageable pageable) {
+    public Flux<Complex> findAll(Pageable pageable) {
         LOG.debug("Request to get all Complexes");
-        return complexRepository.findAll(pageable);
+        return complexRepository.findAllBy(pageable);
+    }
+
+    /**
+     * Returns the number of complexes available.
+     * @return the number of entities in the database.
+     *
+     */
+    public Mono<Long> countAll() {
+        return complexRepository.count();
+    }
+
+    /**
+     * Returns the number of complexes available in search repository.
+     *
+     */
+    public Mono<Long> searchCount() {
+        return complexSearchRepository.count();
     }
 
     /**
@@ -120,7 +133,7 @@ public class ComplexService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<Complex> findOne(Long id) {
+    public Mono<Complex> findOne(Long id) {
         LOG.debug("Request to get Complex : {}", id);
         return complexRepository.findById(id);
     }
@@ -129,11 +142,11 @@ public class ComplexService {
      * Delete the complex by id.
      *
      * @param id the id of the entity.
+     * @return a Mono to signal the deletion
      */
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         LOG.debug("Request to delete Complex : {}", id);
-        complexRepository.deleteById(id);
-        complexSearchRepository.deleteFromIndexById(id);
+        return complexRepository.deleteById(id).then(complexSearchRepository.deleteById(id));
     }
 
     /**
@@ -144,7 +157,7 @@ public class ComplexService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Complex> search(String query, Pageable pageable) {
+    public Flux<Complex> search(String query, Pageable pageable) {
         LOG.debug("Request to search for a page of Complexes for query {}", query);
         return complexSearchRepository.search(query, pageable);
     }

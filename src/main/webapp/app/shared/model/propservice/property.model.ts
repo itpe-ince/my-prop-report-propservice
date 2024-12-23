@@ -3,7 +3,6 @@ import { IComplex } from 'app/shared/model/propservice/complex.model';
 
 export interface IProperty {
   id?: number;
-  complexId?: number;
   address?: string;
   regionCd?: string | null;
   localName?: string | null;

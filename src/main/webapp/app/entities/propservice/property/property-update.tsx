@@ -48,9 +48,6 @@ export const PropertyUpdate = () => {
     if (values.id !== undefined && typeof values.id !== 'number') {
       values.id = Number(values.id);
     }
-    if (values.complexId !== undefined && typeof values.complexId !== 'number') {
-      values.complexId = Number(values.complexId);
-    }
     if (values.floor !== undefined && typeof values.floor !== 'number') {
       values.floor = Number(values.floor);
     }
@@ -120,17 +117,6 @@ export const PropertyUpdate = () => {
                   validate={{ required: true }}
                 />
               ) : null}
-              <ValidatedField
-                label={translate('propserviceApp.propserviceProperty.complexId')}
-                id="property-complexId"
-                name="complexId"
-                data-cy="complexId"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
-                }}
-              />
               <ValidatedField
                 label={translate('propserviceApp.propserviceProperty.address')}
                 id="property-address"

@@ -3,13 +3,13 @@ package com.dnc.mprs.propservice.service;
 import com.dnc.mprs.propservice.domain.Transaction;
 import com.dnc.mprs.propservice.repository.TransactionRepository;
 import com.dnc.mprs.propservice.repository.search.TransactionSearchRepository;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link com.dnc.mprs.propservice.domain.Transaction}.
@@ -35,11 +35,9 @@ public class TransactionService {
      * @param transaction the entity to save.
      * @return the persisted entity.
      */
-    public Transaction save(Transaction transaction) {
+    public Mono<Transaction> save(Transaction transaction) {
         LOG.debug("Request to save Transaction : {}", transaction);
-        transaction = transactionRepository.save(transaction);
-        transactionSearchRepository.index(transaction);
-        return transaction;
+        return transactionRepository.save(transaction).flatMap(transactionSearchRepository::save);
     }
 
     /**
@@ -48,11 +46,9 @@ public class TransactionService {
      * @param transaction the entity to save.
      * @return the persisted entity.
      */
-    public Transaction update(Transaction transaction) {
+    public Mono<Transaction> update(Transaction transaction) {
         LOG.debug("Request to update Transaction : {}", transaction);
-        transaction = transactionRepository.save(transaction);
-        transactionSearchRepository.index(transaction);
-        return transaction;
+        return transactionRepository.save(transaction).flatMap(transactionSearchRepository::save);
     }
 
     /**
@@ -61,7 +57,7 @@ public class TransactionService {
      * @param transaction the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<Transaction> partialUpdate(Transaction transaction) {
+    public Mono<Transaction> partialUpdate(Transaction transaction) {
         LOG.debug("Request to partially update Transaction : {}", transaction);
 
         return transactionRepository
@@ -97,10 +93,10 @@ public class TransactionService {
 
                 return existingTransaction;
             })
-            .map(transactionRepository::save)
-            .map(savedTransaction -> {
-                transactionSearchRepository.index(savedTransaction);
-                return savedTransaction;
+            .flatMap(transactionRepository::save)
+            .flatMap(savedTransaction -> {
+                transactionSearchRepository.save(savedTransaction);
+                return Mono.just(savedTransaction);
             });
     }
 
@@ -111,9 +107,26 @@ public class TransactionService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Transaction> findAll(Pageable pageable) {
+    public Flux<Transaction> findAll(Pageable pageable) {
         LOG.debug("Request to get all Transactions");
-        return transactionRepository.findAll(pageable);
+        return transactionRepository.findAllBy(pageable);
+    }
+
+    /**
+     * Returns the number of transactions available.
+     * @return the number of entities in the database.
+     *
+     */
+    public Mono<Long> countAll() {
+        return transactionRepository.count();
+    }
+
+    /**
+     * Returns the number of transactions available in search repository.
+     *
+     */
+    public Mono<Long> searchCount() {
+        return transactionSearchRepository.count();
     }
 
     /**
@@ -123,7 +136,7 @@ public class TransactionService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<Transaction> findOne(Long id) {
+    public Mono<Transaction> findOne(Long id) {
         LOG.debug("Request to get Transaction : {}", id);
         return transactionRepository.findById(id);
     }
@@ -132,11 +145,11 @@ public class TransactionService {
      * Delete the transaction by id.
      *
      * @param id the id of the entity.
+     * @return a Mono to signal the deletion
      */
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         LOG.debug("Request to delete Transaction : {}", id);
-        transactionRepository.deleteById(id);
-        transactionSearchRepository.deleteFromIndexById(id);
+        return transactionRepository.deleteById(id).then(transactionSearchRepository.deleteById(id));
     }
 
     /**
@@ -147,7 +160,7 @@ public class TransactionService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<Transaction> search(String query, Pageable pageable) {
+    public Flux<Transaction> search(String query, Pageable pageable) {
         LOG.debug("Request to search for a page of Transactions for query {}", query);
         return transactionSearchRepository.search(query, pageable);
     }

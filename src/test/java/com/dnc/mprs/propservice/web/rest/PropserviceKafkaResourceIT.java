@@ -1,40 +1,40 @@
 package com.dnc.mprs.propservice.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import com.dnc.mprs.propservice.IntegrationTest;
 import com.dnc.mprs.propservice.config.EmbeddedKafka;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.cloud.stream.binder.test.InputDestination;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.MimeTypeUtils;
 
-@IntegrationTest
-@AutoConfigureMockMvc
+@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_TIMEOUT)
 @WithMockUser
 @EmbeddedKafka
+@IntegrationTest
 @ImportAutoConfiguration(TestChannelBinderConfiguration.class)
 class PropserviceKafkaResourceIT {
 
+    private static String KAFKA_API = "/api/propservice-kafka/{command}";
+
     @Autowired
-    private MockMvc restMockMvc;
+    private WebTestClient client;
 
     @Autowired
     private InputDestination input;
@@ -42,9 +42,19 @@ class PropserviceKafkaResourceIT {
     @Autowired
     private OutputDestination output;
 
+    @BeforeEach
+    public void setupCsrf() {
+        client = client.mutateWith(csrf());
+    }
+
     @Test
-    void producesMessages() throws Exception {
-        restMockMvc.perform(post("/api/propservice-kafka/publish?message=value-produce").with(csrf())).andExpect(status().isOk());
+    void producesMessages() throws InterruptedException {
+        client
+            .post()
+            .uri(uriBuilder -> uriBuilder.path(KAFKA_API).queryParam("message", "value-produce").build("publish"))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
         assertThat(output.receive(1000, "binding-out-0").getPayload()).isEqualTo("value-produce".getBytes());
     }
 
@@ -54,25 +64,24 @@ class PropserviceKafkaResourceIT {
     }
 
     @Test
-    void consumesMessages() throws Exception {
+    void consumesMessages() {
         Map<String, Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.TEXT_PLAIN_VALUE);
         MessageHeaders headers = new MessageHeaders(map);
         Message<String> testMessage = new GenericMessage<>("value-consume", headers);
-        MvcResult mvcResult = restMockMvc
-            .perform(get("/api/propservice-kafka/register"))
-            .andExpect(status().isOk())
-            .andExpect(request().asyncStarted())
-            .andReturn();
-        for (int i = 0; i < 100; i++) {
-            input.send(testMessage);
-            Thread.sleep(100);
-            String content = mvcResult.getResponse().getContentAsString();
-            if (content.contains("data:value-consume")) {
-                restMockMvc.perform(get("/api/propservice-kafka/unregister"));
-                return;
-            }
-        }
-        fail("Expected content data:value-consume not received");
+        input.send(testMessage);
+        String value = client
+            .get()
+            .uri(KAFKA_API, "consume")
+            .accept(MediaType.TEXT_EVENT_STREAM)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
+            .returnResult(String.class)
+            .getResponseBody()
+            .blockFirst(Duration.ofSeconds(10));
+        assertThat(value).isEqualTo("value-consume");
     }
 }

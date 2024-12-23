@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "changelogDate": "20241212041258"
+    "changelogDate": "20241223103420"
   },
   "applications": ["gateway", "propservice"],
   "clientRootFolder": "propservice",
@@ -8,11 +8,6 @@
   "fields": [
     {
       "fieldName": "id",
-      "fieldType": "Long",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "complexId",
       "fieldType": "Long",
       "fieldValidateRules": ["required"]
     },

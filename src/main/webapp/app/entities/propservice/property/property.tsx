@@ -183,10 +183,6 @@ export const Property = () => {
                   <Translate contentKey="propserviceApp.propserviceProperty.id">Id</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
                 </th>
-                <th className="hand" onClick={sort('complexId')}>
-                  <Translate contentKey="propserviceApp.propserviceProperty.complexId">Complex Id</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('complexId')} />
-                </th>
                 <th className="hand" onClick={sort('address')}>
                   <Translate contentKey="propserviceApp.propserviceProperty.address">Address</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('address')} />
@@ -257,7 +253,6 @@ export const Property = () => {
                       {property.id}
                     </Button>
                   </td>
-                  <td>{property.complexId}</td>
                   <td>{property.address}</td>
                   <td>{property.regionCd}</td>
                   <td>{property.localName}</td>

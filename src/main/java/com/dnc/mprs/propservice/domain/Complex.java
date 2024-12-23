@@ -1,63 +1,63 @@
 package com.dnc.mprs.propservice.domain;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Complex.
  */
-@Entity
-@Table(name = "complex")
+@Table("complex")
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "complex")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Complex implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column("id")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Size(max = 255)
-    @Column(name = "complex_name", length = 255, nullable = false)
+    @Column("complex_name")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String complexName;
 
     @Size(max = 100)
-    @Column(name = "state", length = 100)
+    @Column("state")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String state;
 
     @Size(max = 100)
-    @Column(name = "county", length = 100)
+    @Column("county")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String county;
 
     @Size(max = 100)
-    @Column(name = "city", length = 100)
+    @Column("city")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String city;
 
     @Size(max = 100)
-    @Column(name = "town", length = 100)
+    @Column("town")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String town;
 
     @Size(max = 10)
-    @Column(name = "address_code", length = 10)
+    @Column("address_code")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String addressCode;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("created_at")
     private Instant createdAt;
 
-    @Column(name = "updated_at")
+    @Column("updated_at")
     private Instant updatedAt;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

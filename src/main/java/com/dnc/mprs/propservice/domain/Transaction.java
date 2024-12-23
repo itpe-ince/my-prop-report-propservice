@@ -1,66 +1,66 @@
 package com.dnc.mprs.propservice.domain;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Transaction.
  */
-@Entity
-@Table(name = "transaction")
+@Table("transaction")
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "transaction")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Transaction implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column("id")
     private Long id;
 
-    @NotNull
-    @Column(name = "property_id", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("property_id")
     private Long propertyId;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Size(max = 50)
-    @Column(name = "transaction_type", length = 50, nullable = false)
+    @Column("transaction_type")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String transactionType;
 
-    @NotNull
-    @Column(name = "price", precision = 21, scale = 2, nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("price")
     private BigDecimal price;
 
-    @NotNull
-    @Column(name = "transaction_date", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("transaction_date")
     private Instant transactionDate;
 
     @Size(max = 100)
-    @Column(name = "buyer", length = 100)
+    @Column("buyer")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String buyer;
 
     @Size(max = 100)
-    @Column(name = "seller", length = 100)
+    @Column("seller")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String seller;
 
     @Size(max = 100)
-    @Column(name = "agent", length = 100)
+    @Column("agent")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String agent;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("created_at")
     private Instant createdAt;
 
-    @Column(name = "updated_at")
+    @Column("updated_at")
     private Instant updatedAt;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -114,7 +114,7 @@ public class Transaction implements Serializable {
     }
 
     public void setPrice(BigDecimal price) {
-        this.price = price;
+        this.price = price != null ? price.stripTrailingZeros() : null;
     }
 
     public Instant getTransactionDate() {

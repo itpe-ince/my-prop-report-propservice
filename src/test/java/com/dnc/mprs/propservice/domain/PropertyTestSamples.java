@@ -14,7 +14,6 @@ public class PropertyTestSamples {
     public static Property getPropertySample1() {
         return new Property()
             .id(1L)
-            .complexId(1L)
             .address("address1")
             .regionCd("regionCd1")
             .localName("localName1")
@@ -31,7 +30,6 @@ public class PropertyTestSamples {
     public static Property getPropertySample2() {
         return new Property()
             .id(2L)
-            .complexId(2L)
             .address("address2")
             .regionCd("regionCd2")
             .localName("localName2")
@@ -48,7 +46,6 @@ public class PropertyTestSamples {
     public static Property getPropertyRandomSampleGenerator() {
         return new Property()
             .id(longCount.incrementAndGet())
-            .complexId(longCount.incrementAndGet())
             .address(UUID.randomUUID().toString())
             .regionCd(UUID.randomUUID().toString())
             .localName(UUID.randomUUID().toString())

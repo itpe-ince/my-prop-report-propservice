@@ -19,7 +19,6 @@
         "title": "Property"
       },
       "id": "Id",
-      "complexId": "Complex Id",
       "address": "Address",
       "regionCd": "Region Cd",
       "localName": "Local Name",

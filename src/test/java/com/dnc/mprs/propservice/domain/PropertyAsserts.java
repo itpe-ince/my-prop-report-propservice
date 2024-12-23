@@ -48,7 +48,6 @@ public class PropertyAsserts {
     public static void assertPropertyUpdatableFieldsEquals(Property expected, Property actual) {
         assertThat(expected)
             .as("Verify Property relevant properties")
-            .satisfies(e -> assertThat(e.getComplexId()).as("check complexId").isEqualTo(actual.getComplexId()))
             .satisfies(e -> assertThat(e.getAddress()).as("check address").isEqualTo(actual.getAddress()))
             .satisfies(e -> assertThat(e.getRegionCd()).as("check regionCd").isEqualTo(actual.getRegionCd()))
             .satisfies(e -> assertThat(e.getLocalName()).as("check localName").isEqualTo(actual.getLocalName()))

@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "changelogDate": "20241212041358"
+    "changelogDate": "20241223103520"
   },
   "applications": ["gateway", "propservice"],
   "clientRootFolder": "propservice",
